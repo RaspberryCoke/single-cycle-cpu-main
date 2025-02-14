@@ -7,6 +7,7 @@ module CPU(
 	output wire [31:0] regfile_for_simulator[31:0]
 );
 
-
+select_pc m_select_pc(cur_pc_for_simulator);
+fetch m_fetch()
 
 endmodule
