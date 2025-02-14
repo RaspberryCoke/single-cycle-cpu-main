@@ -5,7 +5,7 @@ module fetch #(WIDTH = 32)
               (input wire [WIDTH - 1:0] pc,
                output wire [WIDTH - 1:0] instr,
                output wire[2:0] ExtOp,          //for debug
-               output wire RegWr,
+               //output wire RegWr,
                output wire ALUAsrc,
                output wire[1:0] ALUBsrc,
                output wire[3:0] ALUctr,
@@ -24,28 +24,19 @@ module fetch #(WIDTH = 32)
             dpi_ebreak(pc);
         end
     end
-    wire[6:0] op;
-    wire[4:0] rs1;
-    wire[4:0] rs2;
-    wire[4:0] rd;
-    wire[2:0] func3;
-    wire[6:0] func7;
-    assign  op    = instr[6:0];
-    assign  rs1   = instr[19:15];
-    assign  rs2   = instr[24:20];
-    assign  rd    = instr[11:7];
-    assign  func3 = instr[14:12];
-    assign  func7 = instr[31:25];
-    wire[31:0] immI;
-    wire[31:0] immU;
-    wire[31:0] immS;
-    wire[31:0] immB;
-    wire[31:0] immJ;
-    assign immI = {{20{instr[31]}}, instr[31:20]};
-    assign immU = {instr[31:12], 12'b0};
-    assign immS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
-    assign immB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
-    assign immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
+
+    wire[6:0]  op    = instr[6:0];
+    wire[4:0]  rs1   = instr[19:15];
+    wire[4:0]  rs2   = instr[24:20];
+    wire[4:0]  rd    = instr[11:7];
+    wire[2:0]  func3 = instr[14:12];
+    wire[6:0]  func7 = instr[31:25];
+
+    wire[31:0] immI = {{20{instr[31]}}, instr[31:20]};
+    wire[31:0] immU = {instr[31:12], 12'b0};
+    wire[31:0] immS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
+    wire[31:0] immB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
+    wire[31:0] immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
     
     wire[4:0] op5;
     assign op5 = op[6:2];
@@ -75,7 +66,7 @@ module fetch #(WIDTH = 32)
     (ExtOp == `immb)?immB:
     (ExtOp == `immj)?immJ:32'b0;
     
-    assign RegWr = (op5 == 5'b11000 || op5 == 5'b01000)?0:1;//wrong ?
+    //assign RegWr = (op5 == 5'b11000 || op5 == 5'b01000)?0:1;//wrong ?
     
     assign Branch = (op5 == 5'b11011)?3'b001:
     (op5 == 5'b11000)?3'b011:3'b000;

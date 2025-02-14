@@ -1,6 +1,8 @@
 
 module memory(
 	   input         clk,	   
+	   input rst,
+	   input wire[31:0]instr,
 	   input [7:0]   load_store_info_i,
 	   
 	   //from execute alu 
