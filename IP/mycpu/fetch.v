@@ -4,6 +4,8 @@
 module fetch #(WIDTH = 32)
               (input wire [WIDTH - 1:0] pc,
                output wire [WIDTH - 1:0] instr,
+               output wire[4:0] Ra,
+               output wire[4:0] Rb,
                output wire[2:0] ExtOp,          //for debug
                //output wire RegWr,
                output wire ALUAsrc,
@@ -38,6 +40,9 @@ module fetch #(WIDTH = 32)
     wire[31:0] immB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
     wire[31:0] immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
     
+    assign Ra=rs1;
+    assign Rb=rs2;
+
     wire[4:0] op5;
     assign op5 = op[6:2];
     
