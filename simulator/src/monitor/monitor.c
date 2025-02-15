@@ -73,9 +73,26 @@ static int parse_args(int argc, char *argv[]) {
   return 0;
 }
 static const uint32_t img [] = {
-  0x00000297,  // auipc t0,0
-  0x00028823,  // sb  zero,16(t0)
-  0x0102c503,  // lbu a0,16(t0)
+  0x00100013,  // addi x0, x0, 1
+  0x00200093,  // addi x1, x0, 2
+  0x00408113,  // addi x2, x1, 4
+  0xffb10193,  // addi x3, x2, -5
+  0x001080b3,  // add x1, x1, x1
+  0x00110133,  // add x2, x2, x1
+  0x001101b3,  // add x3, x2, x1
+  0x00218233,  // add x4, x3, x2
+  0x400202b3,  // sub x5, x4, x0
+  0x40118333,  // sub x6, x3, x1
+  0x00000613,  // addi x12, x0, 0
+  0x00160613,  // addi x12, x12, 1
+  0x00160613,  // addi x12, x12, 1
+  0x00160613,  // addi x12, x12, 1
+  0x00160613,  // addi x12, x12, 1 x12==4
+  0x00300593,  // addi x11, x0, 3  x11==3
+  0x00c59463,  // bne x11, x12, 8
+  0x400202b3,  // sub x5, x4, x0
+  0x400202b3,  // sub x5, x4, x0
+  0x00100013,  // addi x0, x0, 1
   0x00100073,  // ebreak (used as nemu_trap)
   0xdeadbeef,  // some data
 };

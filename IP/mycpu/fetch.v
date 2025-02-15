@@ -65,7 +65,8 @@ module fetch #(WIDTH = 32)
     (op5 == 5'b01000)?`imms:3'b111;//wrong ?
     
     
-    assign imm = (ExtOp == `imms)?immS:
+    assign imm = 
+    (ExtOp == `immi)?immI:
     (ExtOp == `immu)?immU:
     (ExtOp == `imms)?immS:
     (ExtOp == `immb)?immB:

@@ -70,7 +70,8 @@ decode decode_module(
 	.RegWr(RegWr),//from writeback
 	.busW(busW),//from writeback
 	.rs1(rs1),
-	.rs2(rs2)
+	.rs2(rs2),
+	.regfile_for_simulator(regfile_for_simulator)
 );
 
 execute execute_module(

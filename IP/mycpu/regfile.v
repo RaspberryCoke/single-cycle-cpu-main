@@ -11,10 +11,10 @@ module regfile(
 	//write 
 	input            w_en,        //write enable
 	input   [ 4:0]   rd_id_i,
-	input   [31:0]   rd_write_data_i
+	input   [31:0]   rd_write_data_i,
 	
 	//for moniter regfile status 
-
+	output wire [31:0] regfile_for_simulator[31:0]
 );
 
 reg [31:0] rf[31:0];
@@ -38,6 +38,6 @@ always @(posedge clk) begin
     end
 end   
 
-
+assign regfile_for_simulator=rf;
 
 endmodule

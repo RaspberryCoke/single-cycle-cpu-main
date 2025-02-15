@@ -1,5 +1,5 @@
-TOPNAME :=cpu_top
-CPU_DIR :=$(CPU_HOME)/IP/single-cycle-cpu
+TOPNAME :=CPU
+CPU_DIR :=$(CPU_HOME)/IP/mycpu
 
 
 PREFIX_NAME:=npc
