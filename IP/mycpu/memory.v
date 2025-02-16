@@ -4,8 +4,8 @@ module memory(input wire clk,
               input wire[31:0] instr,
               input wire[31:0] execute_out,
               input wire MemtoReg,
-              input wire[31:0] DataIn,
-              output wire[31:0] DataOut);
+              input wire[31:0] rs2,
+              output wire[31:0] memory_out);
     //MemtoReg ：宽度为1bit，选择寄存器rd写回数据来源，为0时选择ALU输出，
     //为1时选择数据存储器输出。
     import "DPI-C" function void dpi_mem_write(input int addr, input int data, int len);
@@ -24,6 +24,7 @@ module memory(input wire clk,
     wire store_word              = (opcode == 7'b0100011) && (funct3 == 3'b010);  // sw
     
     wire read_en = load_byte|load_half_word|load_word|load_byte_unsigned|load_half_word_unsigned;
+    wire write_en=store_byte|store_half_word|store_word;
     
     reg[31:0] mem_data_o;
     
@@ -38,29 +39,35 @@ module memory(input wire clk,
     (load_half_word)         ? load_half_word_data   :
     (load_word)              ? load_word_data        :
     (load_byte_unsigned)     ? load_byte_data_u      :
-    (load_half_word_unsigned)? load_half_word_data_u : mem_data_o;
+    (load_half_word_unsigned)? load_half_word_data_u : 32'b0;
     
-    assign DataOut=(MemtoReg==1)?read_data_out:addr;//注意这里：addr为ALU输出
-    
+
+    assign memory_out=(MemtoReg==1)?read_data_out:execute_out;//
+
+    wire[31:0]addr=execute_out;
     always @(*) begin
         if (read_en) begin
             mem_data_o = dpi_mem_read(addr, 4);
+            $display("\t[memory.v]: read data from memory,addr is %8h,data is %8h.",addr,mem_data_o);
         end
         else begin
             mem_data_o = 32'b0;
         end
     end
     
-    wire [31:0] data=DataIn;
+    wire [31:0] data=rs2;
     always @(posedge clk) begin
         if (store_byte) begin
             dpi_mem_write(addr, data, 1);
+            $display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
         end
         else if (store_half_word) begin
             dpi_mem_write(addr, data, 2);
+            $display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
         end
             else if (store_word) begin
             dpi_mem_write(addr, data, 4);
+            $display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
         end
     end
             

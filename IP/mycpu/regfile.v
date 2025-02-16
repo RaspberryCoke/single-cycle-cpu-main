@@ -37,7 +37,7 @@ reg [31:0] rf[31:0];
 	wire store_instr=store_byte|store_half_word|store_word;
 always@(*)begin
 	if(store_instr&& rd_id_i != 0)
-		begin $display("\nstore instr:: read data from regfile[%h]=%h.\n",rd_id_i,rd_write_data_i); end
+		begin $display("\t[refile.v]:store instr:: read data from regfile[%h]=%h.\n",rd_id_i,rd_write_data_i); end
 end
 
 assign rs1_rdata_o = (rs1_id_i == 5'b0) ? 32'b0 : rf[rs1_id_i];
@@ -59,7 +59,7 @@ always @(posedge clk) begin
     else if(w_en && rd_id_i != 0) begin
 	rf[rd_id_i] <= rd_write_data_i;
 	if(load_instr)
-		$display("\nload instr:: write data to regfile[%h]=%h.\n",rd_id_i,rd_write_data_i);
+		$display("\t[refile.v]:load instr:: write data to regfile[%h]=%h.\n",rd_id_i,rd_write_data_i);
     end
 end   
 
