@@ -38,8 +38,8 @@ module execute(input wire clk,
     (ALUctr == 4'b0011)?ALU_B://拷贝立即数 lui
     (ALUctr == 4'b0001)?ALU_A << ALU_B[4:0]:// <<
     (ALUctr == 4'b0101)?ALU_A >> ALU_B[4:0]:// >>
-    (ALUctr == 4'b1101)?($signed(ALU_A) >>> ALU_B[4:0])://>>>    待测试
-    (ALUctr == 4'b0010)?(($signed(ALU_A) < $signed(ALU_B))?32'b1:32'b0)://slt    猜测
+    (ALUctr == 4'b1101)?( $signed($signed(ALU_A) >>> ALU_B[4:0]))://>>>    待测试
+    (ALUctr == 4'b0010)?( $signed(($signed(ALU_A) < $signed(ALU_B)))?32'b1:32'b0)://slt    猜测
     (ALUctr == 4'b1010)?((ALU_A < ALU_B)?32'b1:32'b0)://sltu    猜测
     32'b0;
 
@@ -70,10 +70,10 @@ module execute(input wire clk,
 
 	wire load_instr=load_byte|load_half_word|load_word|load_byte_unsigned|load_half_word_unsigned;
 	wire store_instr=store_byte|store_half_word|store_word;
-always@(*)begin
-	if(op5==5'b01101)
-		begin $display("\t[execute.v]:store instr::imm=%8h,ALU_A=%8h,ALU_B=%8h.\n\tinstr=%8h",imm,ALU_A,ALU_B,instr); end
-end
+// always@(*)begin
+// 	if(op5==5'b01101)
+// 		begin $display("\t[execute.v]:store instr::imm=%8h,ALU_A=%8h,ALU_B=%8h.\n\tinstr=%8h",imm,ALU_A,ALU_B,instr); end
+// end
   
 endmodule
     

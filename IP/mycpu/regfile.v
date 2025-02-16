@@ -35,10 +35,10 @@ reg [31:0] rf[31:0];
 
 	wire load_instr=load_byte|load_half_word|load_word|load_byte_unsigned|load_half_word_unsigned;
 	wire store_instr=store_byte|store_half_word|store_word;
-always@(*)begin
-	if(opcode==7'b0110111)
-		begin $display("\t[refile.v]:store instr:: read data from regfile[%h]=%h.\n",rd_id_i,rd_write_data_i); end
-end
+// always@(*)begin
+// 	if(opcode==7'b0110111)
+// 		begin $display("\t[refile.v]:store instr:: read data from regfile[%h]=%h.\n",rd_id_i,rd_write_data_i); end
+// end
 
 assign rs1_rdata_o = (rs1_id_i == 5'b0) ? 32'b0 : rf[rs1_id_i];
 assign rs2_rdata_o = (rs2_id_i == 5'b0) ? 32'b0 : rf[rs2_id_i];
@@ -58,8 +58,8 @@ always @(posedge clk) begin
     end
     else if(w_en && rd_id_i != 0) begin
 	rf[rd_id_i] <= rd_write_data_i;
-	if(opcode==7'b0110111)
-		$display("\t[refile.v]:load instr:: write data to regfile[%h]=%h.\n",rd_id_i,rd_write_data_i);
+	// if(opcode==7'b0110111)
+	// 	$display("\t[refile.v]:load instr:: write data to regfile[%h]=%h.\n",rd_id_i,rd_write_data_i);
     end
 end   
 
