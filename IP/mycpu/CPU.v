@@ -4,9 +4,8 @@ module CPU(
 	input wire rst,
 
 	output wire [31:0] cur_pc_for_simulator
-	//output wire [31:0] regfile_for_simulator[31:0]
 );
-wire [31:0] regfile_for_simulator[31:0];//
+
 //select_pc
 wire[31:0] pc;
 wire[31:0] NextPC;
@@ -25,7 +24,7 @@ wire MemWr;
 wire[2:0] MemOP;
 wire[31:0]imm;//from fetch to execute
 //decode
-wire[4:0] wb_to_reg_num;//Rw
+wire[4:0] wb_to_reg_id;//Rw
 //wire[4:0] Rw;//from writeback to decode
 wire wb_to_reg_en;//RegWr
 // wire RegWr;//from writeback to decode
@@ -81,7 +80,6 @@ decode decode_module(
 	.busW(wb_to_reg_data),//from writeback
 	.rs1(rs1),
 	.rs2(rs2),
-	.regfile_for_simulator(regfile_for_simulator)
 );
 
 execute execute_module(
@@ -120,7 +118,7 @@ writeback writeback_module(
 	.instr(instr),
 	.memory_out(memory_out),
 	.wb_to_reg_data(wb_to_reg_data),//from writeback to decode
-	.wb_to_reg_num(wb_to_reg_num),
+	.wb_to_reg_id(wb_to_reg_id),
 	.wb_to_reg_en(wb_to_reg_en)
 );
 

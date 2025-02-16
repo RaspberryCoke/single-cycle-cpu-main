@@ -1,6 +1,6 @@
 module execute(input wire clk,
                input wire rst,
-               input wire[31:0] instr,
+               input wire[31:0] instr_debug,
                input wire[31:0] pc,
                input wire[31:0] rs1,
                input wire[31:0] rs2,
@@ -20,8 +20,8 @@ module execute(input wire clk,
     //Branch ：宽度为3bit，说明分支和跳转的种类，用于生成最终的分支控制信号
     //MemtoReg ：宽度为1bit，选择寄存器rd写回数据来源，为0时选择ALU输出，为1时选择数据存储器输出。
 
-    wire[4:0] op5=instr[6:2];
-    wire[2:0] func3=instr[14:12];
+    wire[4:0] op5=instr_debug[6:2];
+    wire[2:0] func3=instr_debug[14:12];
     
     wire[31:0] ALU_A = ((ALUAsrc == 1)?pc:rs1);
     wire[31:0] ALU_B = 
@@ -38,9 +38,9 @@ module execute(input wire clk,
     (ALUctr == 4'b0011)?ALU_B://拷贝立即数 lui
     (ALUctr == 4'b0001)?ALU_A << ALU_B[4:0]:// <<
     (ALUctr == 4'b0101)?ALU_A >> ALU_B[4:0]:// >>
-    (ALUctr == 4'b1101)?( $signed($signed(ALU_A) >>> ALU_B[4:0]))://>>>    待测试
-    (ALUctr == 4'b0010)?( $signed(($signed(ALU_A) < $signed(ALU_B)))?32'b1:32'b0)://slt    猜测
-    (ALUctr == 4'b1010)?((ALU_A < ALU_B)?32'b1:32'b0)://sltu    猜测
+    (ALUctr == 4'b1101)?( $signed($signed(ALU_A) >>> ALU_B[4:0]))://>>>算术右移
+    (ALUctr == 4'b0010)?( $signed(($signed(ALU_A) < $signed(ALU_B)))?32'b1:32'b0)://slt   
+    (ALUctr == 4'b1010)?((ALU_A < ALU_B)?32'b1:32'b0)://sltu   
     32'b0;
 
     assign Zero=(ALUctr == 4'b0010 && op5==5'b11000 && (func3==3'b000 || func3==3'b001) && (ALU_A==ALU_B))?1:0;
@@ -56,8 +56,8 @@ module execute(input wire clk,
     assign NextPC=PCA+PCB;
 
 
-    wire [6:0] opcode = instr[6:0];
-    wire [2:0] funct3 = instr[14:12];
+    wire [6:0] opcode = instr_debug[6:0];
+    wire [2:0] funct3 = instr_debug[14:12];
 
     wire load_byte               = (opcode == 7'b0000011) && (funct3 == 3'b000);  // lb
     wire load_half_word          = (opcode == 7'b0000011) && (funct3 == 3'b001);  // lh

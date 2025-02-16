@@ -7,8 +7,7 @@ module decode(input wire clk,
               input wire RegWr,//from writeback
               input wire[31:0] busW,//from writeback
               output wire[31:0]rs1,
-              output wire[31:0]rs2,
-              output wire [31:0] regfile_for_simulator[31:0]
+              output wire[31:0]rs2
               );
     
     regfile rf(
@@ -22,7 +21,6 @@ module decode(input wire clk,
     .w_en(RegWr),
     .rd_id_i(Rw),
     .rd_write_data_i(busW),
-    .regfile_for_simulator(regfile_for_simulator)
     );
     
 endmodule

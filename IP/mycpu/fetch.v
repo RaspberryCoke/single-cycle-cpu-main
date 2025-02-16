@@ -15,6 +15,8 @@ module fetch #(WIDTH = 32)
                output wire MemtoReg,
                output wire MemWr,
                output wire[2:0] MemOP,
+               output wire Zero,
+               output wire Less,
                output wire[31:0]imm);
     import "DPI-C" function int  dpi_mem_read 	(input int addr  , input int len);
     import "DPI-C" function void dpi_ebreak		(input int pc);
@@ -112,5 +114,10 @@ module fetch #(WIDTH = 32)
     ((op5 == 5'b00100&&func3 == 3'b101&&func7[5] == 0)||(op5 == 5'b01100&&func3 == 3'b101&&func7[5] == 0))?4'b0101:
     ((op5 == 5'b00100&&func3 == 3'b101&&func7[5] == 1)||(op5 == 5'b01100&&func3 == 3'b101&&func7[5] == 1))?4'b1101:
     (op5 == 5'b01100&&func3 == 3'b000&&func7[5] == 1)?4'b1000:4'b0000;
+
+    assign Zero=(ALUctr == 4'b0010 && op5==5'b11000 && (func3==3'b000 || func3==3'b001))?1:0;
+    assign Less=
+    ((ALUctr == 4'b0010 && op5==5'b11000 && (func3==3'b100 || func3==3'b101) )||
+    (ALUctr == 4'b1010 && op5==5'b11000 && (func3==3'b110 || func3==3'b111) ))?1:0;
     
 endmodule
