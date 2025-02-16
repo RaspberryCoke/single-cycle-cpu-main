@@ -14,6 +14,7 @@ module decode(input wire clk,
     regfile rf(
     .clk(clk),
     .rst(rst),
+    .instr(instr),
     .rs1_id_i(Ra),
     .rs2_id_i(Rb),
     .rs1_rdata_o(rs1),

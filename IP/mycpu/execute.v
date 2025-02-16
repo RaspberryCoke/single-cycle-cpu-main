@@ -35,10 +35,10 @@ module execute(input wire clk,
     (ALUctr == 4'b0111)?ALU_A & ALU_B://&
     (ALUctr == 4'b0110)?ALU_A | ALU_B:// |
     (ALUctr == 4'b0100)?ALU_A ^ ALU_B:// ^
-    (ALUctr == 4'b0011)?ALU_B://拷贝立即数
+    (ALUctr == 4'b0011)?ALU_B://拷贝立即数 lui
     (ALUctr == 4'b0001)?ALU_A << ALU_B[4:0]:// <<
     (ALUctr == 4'b0101)?ALU_A >> ALU_B[4:0]:// >>
-    (ALUctr == 4'b1101)?$signed(ALU_A) >>> ALU_B[4:0]://>>>    待测试
+    (ALUctr == 4'b1101)?($signed(ALU_A) >>> ALU_B[4:0])://>>>    待测试
     (ALUctr == 4'b0010)?(($signed(ALU_A) < $signed(ALU_B))?32'b1:32'b0)://slt    猜测
     (ALUctr == 4'b1010)?((ALU_A < ALU_B)?32'b1:32'b0)://sltu    猜测
     32'b0;

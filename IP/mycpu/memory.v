@@ -2,7 +2,7 @@
 module memory(input wire clk,
               input wire rst,
               input wire[31:0] instr,
-              input wire[31:0] addr,
+              input wire[31:0] execute_out,
               input wire MemtoReg,
               input wire[31:0] DataIn,
               output wire[31:0] DataOut);
