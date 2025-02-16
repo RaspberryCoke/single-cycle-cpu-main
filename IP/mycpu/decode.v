@@ -1,6 +1,7 @@
 module decode(input wire clk,
               input wire rst,
-              input wire[31:0] instr,
+              input wire[31:0] instr_debug,
+              input wire[31:0] pc_debug,
               input wire[4:0] Ra,
               input wire[4:0] Rb,
               input wire[4:0] Rw,//from writeback
@@ -13,7 +14,7 @@ module decode(input wire clk,
     regfile rf(
     .clk(clk),
     .rst(rst),
-    .instr(instr),
+    .instr_debug(instr_debug),
     .rs1_id_i(Ra),
     .rs2_id_i(Rb),
     .rs1_rdata_o(rs1),

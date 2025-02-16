@@ -14,7 +14,7 @@ assign cur_pc_for_simulator=pc;
 wire[31:0] instr;
 wire[4:0] Ra;
 wire[4:0] Rb;
-wire[2:0] ExtOp;
+
 wire ALUAsrc;
 wire[1:0] ALUBsrc;
 wire[3:0] ALUctr;
@@ -22,7 +22,7 @@ wire[2:0] Branch;
 wire MemtoReg;
 wire MemWr;
 wire[2:0] MemOP;
-wire[31:0]imm;//from fetch to execute
+wire[31:0]Imm;//from fetch to execute
 //decode
 wire[4:0] wb_to_reg_id;//Rw
 //wire[4:0] Rw;//from writeback to decode
@@ -58,7 +58,7 @@ fetch fetch_module(
 	.instr(instr),
 	.Ra(Ra),
 	.Rb(Rb),
-	.ExtOp(ExtOp),
+
 	.ALUAsrc(ALUAsrc),
 	.ALUBsrc(ALUBsrc),
 	.ALUctr(ALUctr),
@@ -66,16 +66,19 @@ fetch fetch_module(
 	.MemtoReg(MemtoReg),
 	.MemWr(MemWr),
 	.MemOP(MemOP),
-	.imm(imm)
+	.Zero(Zero),
+	.Less(Less),
+	.Imm(Imm)
 );
 
 decode decode_module(
 	.clk(clk),
 	.rst(rst),
-	.instr(instr),
+	.instr_debug(instr),
+	.pc_debug(pc),
 	.Ra(Ra),
 	.Rb(Rb),
-	.Rw(wb_to_reg_num),//from writeback
+	.Rw(wb_to_reg_id),//from writeback
 	.RegWr(wb_to_reg_en),//from writeback
 	.busW(wb_to_reg_data),//from writeback
 	.rs1(rs1),
@@ -85,11 +88,12 @@ decode decode_module(
 execute execute_module(
 	.clk(clk),
 	.rst(rst),
-	.instr(instr),
+	.instr_debug(instr),
+	.pc_debug(pc),
 	.pc(pc),
 	.rs1(rs1),
 	.rs2(rs2),
-	.imm(imm),
+	.Imm(Imm),
 	.ALUAsrc(ALUAsrc),
 	.ALUBsrc(ALUBsrc),
 	.ALUctr(ALUctr),
@@ -103,7 +107,8 @@ execute execute_module(
 memory memory_module(
 	.clk(clk),
 	.rst(rst),
-	.instr(instr),
+	.instr_debug(instr),
+	.pc_debug(pc),
 	.execute_out(Result),
 	.MemtoReg(MemtoReg),
 	.rs2(rs2),
@@ -115,7 +120,8 @@ memory memory_module(
 writeback writeback_module(
 	.clk(clk),
 	.rst(rst),
-	.instr(instr),
+	.instr_debug(instr),
+	.pc_debug(pc),
 	.memory_out(memory_out),
 	.wb_to_reg_data(wb_to_reg_data),//from writeback to decode
 	.wb_to_reg_id(wb_to_reg_id),

@@ -6,7 +6,6 @@ module fetch #(WIDTH = 32)
                output wire [WIDTH - 1:0] instr,
                output wire[4:0] Ra,
                output wire[4:0] Rb,
-               output wire[2:0] ExtOp,          //for debug
                //output wire RegWr,
                output wire ALUAsrc,
                output wire[1:0] ALUBsrc,
@@ -17,7 +16,8 @@ module fetch #(WIDTH = 32)
                output wire[2:0] MemOP,
                output wire Zero,
                output wire Less,
-               output wire[31:0]imm);
+               output wire ImmValid,
+               output wire[31:0]Imm);
     import "DPI-C" function int  dpi_mem_read 	(input int addr  , input int len);
     import "DPI-C" function void dpi_ebreak		(input int pc);
     
@@ -36,11 +36,11 @@ module fetch #(WIDTH = 32)
     wire[2:0]  func3 = instr[14:12];
     wire[6:0]  func7 = instr[31:25];
 
-    wire[31:0] immI = {{20{instr[31]}}, instr[31:20]};
-    wire[31:0] immU = {instr[31:12], 12'b0};
-    wire[31:0] immS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
-    wire[31:0] immB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
-    wire[31:0] immJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
+    wire[31:0] ImmI = {{20{instr[31]}}, instr[31:20]};
+    wire[31:0] ImmU = {instr[31:12], 12'b0};
+    wire[31:0] ImmS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
+    wire[31:0] ImmB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
+    wire[31:0] ImmJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
     
     assign Ra=rs1;
     assign Rb=rs2;
@@ -48,7 +48,7 @@ module fetch #(WIDTH = 32)
     wire[4:0] op5;
     assign op5 = op[6:2];
     
-    assign ExtOp = 
+    wire[2:0] ExtOp = 
     (
     (op5 == 5'b00100 && func3 == 3'b000)||
     (op5 == 5'b00100 && func3 == 3'b010)||
@@ -60,19 +60,21 @@ module fetch #(WIDTH = 32)
     (op5 == 5'b00100 && func3 == 3'b101)||
     (op5 == 5'b11001 && func3 == 3'b000)||
     (op5 == 5'b00000)
-    )?`immi://9条指令
-    ((op5 == 5'b01101)||(op5 == 5'b00101))?`immu://一共就两条指令
-    (op5 == 5'b11011)?`immj:
-    (op5 == 5'b11000)?`immb:
-    (op5 == 5'b01000)?`imms:3'b111;//wrong ?
+    )?`IMMI://9条指令
+    ((op5 == 5'b01101)||(op5 == 5'b00101))?`IMMU://一共就两条指令
+    (op5 == 5'b11011)?`IMMJ:
+    (op5 == 5'b11000)?`IMMB:
+    (op5 == 5'b01000)?`IMMS:`IMM_ERR;//wrong ?
     
     
-    assign imm = 
-    (ExtOp == `immi)?immI:
-    (ExtOp == `immu)?immU:
-    (ExtOp == `imms)?immS:
-    (ExtOp == `immb)?immB:
-    (ExtOp == `immj)?immJ:32'b0;
+    assign Imm = 
+    (ExtOp == `IMMI)?ImmI:
+    (ExtOp == `IMMU)?ImmU:
+    (ExtOp == `IMMS)?ImmS:
+    (ExtOp == `IMMB)?ImmB:
+    (ExtOp == `IMMJ)?ImmJ:32'b0;
+
+    assign ImmValid=(ExtOp == `IMM_ERR);
     
     //assign RegWr = (op5 == 5'b11000 || op5 == 5'b01000)?0:1;//wrong ?
     
