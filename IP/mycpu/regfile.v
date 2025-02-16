@@ -36,7 +36,7 @@ reg [31:0] rf[31:0];
 	wire load_instr=load_byte|load_half_word|load_word|load_byte_unsigned|load_half_word_unsigned;
 	wire store_instr=store_byte|store_half_word|store_word;
 always@(*)begin
-	if(store_instr&& rd_id_i != 0)
+	if(opcode==7'b0110111)
 		begin $display("\t[refile.v]:store instr:: read data from regfile[%h]=%h.\n",rd_id_i,rd_write_data_i); end
 end
 
@@ -58,7 +58,7 @@ always @(posedge clk) begin
     end
     else if(w_en && rd_id_i != 0) begin
 	rf[rd_id_i] <= rd_write_data_i;
-	if(load_instr)
+	if(opcode==7'b0110111)
 		$display("\t[refile.v]:load instr:: write data to regfile[%h]=%h.\n",rd_id_i,rd_write_data_i);
     end
 end   

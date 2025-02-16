@@ -48,7 +48,7 @@ module memory(input wire clk,
     always @(*) begin
         if (read_en) begin
             mem_data_o = dpi_mem_read(addr, 4);
-            $display("\t[memory.v]: read data from memory,addr is %8h,data is %8h.",addr,mem_data_o);
+            //$display("\t[memory.v]: read data from memory,addr is %8h,data is %8h.",addr,mem_data_o);
         end
         else begin
             mem_data_o = 32'b0;
@@ -59,15 +59,15 @@ module memory(input wire clk,
     always @(posedge clk) begin
         if (store_byte) begin
             dpi_mem_write(addr, data, 1);
-            $display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
+            //$display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
         end
         else if (store_half_word) begin
             dpi_mem_write(addr, data, 2);
-            $display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
+            //$display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
         end
             else if (store_word) begin
             dpi_mem_write(addr, data, 4);
-            $display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
+            //$display("\t[memory.v]: write data to memory,addr is %8h,data is %8h.",addr,data);
         end
     end
             

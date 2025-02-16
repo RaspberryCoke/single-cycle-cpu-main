@@ -55,6 +55,25 @@ module execute(input wire clk,
     wire[31:0]PCB=((PCBsrc==0)?pc:rs1);
     assign NextPC=PCA+PCB;
 
+
+    wire [6:0] opcode = instr[6:0];
+    wire [2:0] funct3 = instr[14:12];
+
+    wire load_byte               = (opcode == 7'b0000011) && (funct3 == 3'b000);  // lb
+    wire load_half_word          = (opcode == 7'b0000011) && (funct3 == 3'b001);  // lh
+    wire load_word               = (opcode == 7'b0000011) && (funct3 == 3'b010);  // lw
+    wire load_byte_unsigned      = (opcode == 7'b0000011) && (funct3 == 3'b100);  // lbu
+    wire load_half_word_unsigned = (opcode == 7'b0000011) && (funct3 == 3'b101);  // lhu
+    wire store_byte              = (opcode == 7'b0100011) && (funct3 == 3'b000);  // sb
+    wire store_half_word         = (opcode == 7'b0100011) && (funct3 == 3'b001);  // sh
+    wire store_word              = (opcode == 7'b0100011) && (funct3 == 3'b010);  // sw
+
+	wire load_instr=load_byte|load_half_word|load_word|load_byte_unsigned|load_half_word_unsigned;
+	wire store_instr=store_byte|store_half_word|store_word;
+always@(*)begin
+	if(op5==5'b01101)
+		begin $display("\t[execute.v]:store instr::imm=%8h,ALU_A=%8h,ALU_B=%8h.\n\tinstr=%8h",imm,ALU_A,ALU_B,instr); end
+end
   
 endmodule
     
