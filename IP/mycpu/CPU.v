@@ -29,16 +29,14 @@ wire WB_REG_WRITE_EN_OUT;//writeback to decode,是否需要写回reg
 wire[4:0] WB_REG_ID_OUT;//writeback to decode,准备写回的reg的id
 wire[31:0] WB_DATA_OUT;//writeback to decode,准备写回的reg的data
 
-wire[31:0]DEC_REG_VALUE_OUT1;//decode to execute
-wire[31:0]DEC_REG_VALUE_OUT2;//decode to execute
+wire[31:0]DECODE_REG_VALUE_OUT1;//decode to execute
+wire[31:0]DECODE_REG_VALUE_OUT2;//decode to execute
 
 //execute
-wire Less;
-wire Zero;
-wire[31:0] Result;
+wire[31:0] EXECUTE_OUT;
 wire[31:0] NextPC;//from execute to select_pc
 //memory
-wire[31:0] memory_out;//DataOut
+wire[31:0] MEMORY_OUT;//DataOut
 
 
 
@@ -55,34 +53,9 @@ select_pc select_pc_module(
 
 fetch fetch_module(
 	.pc(pc),
-	.instr(instr),
-	.Ra(Ra),
-	.Rb(Rb),
-
-	.ALUAsrc(ALUAsrc),
-	.ALUBsrc(ALUBsrc),
-	.ALUctr(ALUctr),
-	.Branch(Branch),
-	.MemtoReg(MemtoReg),
-	.MemWr(MemWr),
-	.MemOP(MemOP),
-	.Zero(Zero),
-	.Less(Less),
-	.Imm(Imm)
+	.instr(instr)
 );
 
-// module decode(input wire clk,
-//               input wire rst,
-//               input wire[31:0] instr,
-//               input wire[31:0] pc,
-
-//               input wire WBtoDEC_REG_WRITE_EN_IN,//from writeback
-//               input wire[4:0] WBtoDEC_REG_ID_IN,//from writeback
-//               input wire[31:0] WBtoDEC_DATA_IN,//from writeback
-
-//               output wire[31:0]REG_VALUE_OUT1,
-//               output wire[31:0]REG_VALUE_OUT2
-//               );
 
 decode decode_module(
 	.clk(clk),
@@ -90,44 +63,39 @@ decode decode_module(
 	.instr(instr),
 	.pc(pc),
 
-	.WBtoDEC_REG_WRITE_EN_IN(WB_REG_WRITE_EN_OUT),
-	.WBtoDEC_REG_ID_IN(WB_REG_ID_OUT),
-	.WBtoDEC_DATA_IN(WB_DATA_OUT),
+	.WRITEBACK_TO_DECODE_REG_WRITE_EN_IN(WB_REG_WRITE_EN_OUT),
+	.WRITEBACK_TO_DECODE_REG_ID_IN(WB_REG_ID_OUT),
+	.WRITEBACK_TO_DECODE_DATA_IN(WB_DATA_OUT),
 
-	.REG_VALUE_OUT1(DEC_REG_VALUE_OUT1),//from writeback
-	.REG_VALUE_OUT2(DEC_REG_VALUE_OUT2)//from writeback
+	.REG_VALUE_OUT1(DECODE_REG_VALUE_OUT1),//from writeback
+	.REG_VALUE_OUT2(DECODE_REG_VALUE_OUT2)//from writeback
 );
+
+
 
 execute execute_module(
 	.clk(clk),
 	.rst(rst),
 	.instr(instr),
 	.pc(pc),
-	.rs1(rs1),
-	.rs2(rs2),
-	.Imm(Imm),
-	.ALUAsrc(ALUAsrc),
-	.ALUBsrc(ALUBsrc),
-	.ALUctr(ALUctr),
-	.Branch(Branch),
-	.Less(Less),
-	.Zero(Zero),
-	.Result(Result),
+	.REG_VALUE_IN1(DECODE_REG_VALUE_OUT1),
+	.REG_VALUE_IN2(DECODE_REG_VALUE_OUT2),
+	.EXECUTE_OUT(EXECUTE_OUT),
 	.NextPC(NextPC)
 );
-
 
 
 
 memory memory_module(
 	.clk(clk),
 	.rst(rst),
-	.instr_debug(instr),
-	.pc_debug(pc),
-	.execute_out(Result),
+	.instr(instr),
+	.pc(pc),
+
+	.EXECUTE_IN(EXECUTE_OUT),
 	.MemtoReg(MemtoReg),
 	.rs2(rs2),
-	.memory_out(memory_out)
+	.MEMORY_OUT(MEMORY_OUT)
 );
 
 
@@ -135,12 +103,13 @@ memory memory_module(
 writeback writeback_module(
 	.clk(clk),
 	.rst(rst),
-	.instr_debug(instr),
-	.pc_debug(pc),
-	.memory_out(memory_out),
-	.wb_to_reg_data(wb_to_reg_data),//from writeback to decode
-	.wb_to_reg_id(wb_to_reg_id),
-	.wb_to_reg_en(wb_to_reg_en)
+	.instr(instr),
+	.pc(pc),
+	.MEMORY_IN(memory_out),
+	.WRITEBACK_TO_DECODE_REG_DATA(WRITEBACK_TO_DECODE_REG_DATA),//from writeback to decode
+	.WRITEBACK_TO_DECODE_REG_ID(WRITEBACK_TO_DECODE_REG_ID),
+	.WRITEBACK_TO_DECODE_REG_EN(WRITEBACK_TO_DECODE_REG_EN)
 );
+
 
 endmodule

@@ -3,7 +3,7 @@
 `include "define.v"
 module fetch #(WIDTH = 32)
               (input wire [WIDTH - 1:0] pc,
-               output wire [WIDTH - 1:0] instr,
+               output wire [WIDTH - 1:0] instr)
 ;
     import "DPI-C" function int  dpi_mem_read 	(input int addr  , input int len);
     import "DPI-C" function void dpi_ebreak		(input int pc);
@@ -29,52 +29,16 @@ module fetch #(WIDTH = 32)
     wire[31:0] ImmB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
     wire[31:0] ImmJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
     
-    assign Ra=rs1;
-    assign Rb=rs2;
+
 
     wire[4:0] op5;
     assign op5 = op[6:2];
     
-    wire[2:0] ExtOp = 
-    (
-    (op5 == 5'b00100 && func3 == 3'b000)||
-    (op5 == 5'b00100 && func3 == 3'b010)||
-    (op5 == 5'b00100 && func3 == 3'b011)||
-    (op5 == 5'b00100 && func3 == 3'b100)||
-    (op5 == 5'b00100 && func3 == 3'b110)||
-    (op5 == 5'b00100 && func3 == 3'b111)||
-    (op5 == 5'b00100 && func3 == 3'b001 && func7[5] == 0)||
-    (op5 == 5'b00100 && func3 == 3'b101)||
-    (op5 == 5'b11001 && func3 == 3'b000)||
-    (op5 == 5'b00000)
-    )?`IMMI://9条指令
-    ((op5 == 5'b01101)||(op5 == 5'b00101))?`IMMU://一共就两条指令
-    (op5 == 5'b11011)?`IMMJ:
-    (op5 == 5'b11000)?`IMMB:
-    (op5 == 5'b01000)?`IMMS:`IMM_ERR;//wrong ?
-    
-    
-    assign Imm = 
-    (ExtOp == `IMMI)?ImmI:
-    (ExtOp == `IMMU)?ImmU:
-    (ExtOp == `IMMS)?ImmS:
-    (ExtOp == `IMMB)?ImmB:
-    (ExtOp == `IMMJ)?ImmJ:32'b0;
+  
 
-    assign ImmValid=(ExtOp == `IMM_ERR);
+   
     
-    //assign RegWr = (op5 == 5'b11000 || op5 == 5'b01000)?0:1;//wrong ?
-    
-    assign Branch = 
-    (op5 == 5'b11011)?3'b001:
-    (op5 == 5'b11001 && func3==3'b000)?3'b010:
-    (op5 == 5'b11000 && func3==3'b000)?3'b100:
-    (op5 == 5'b11000 && func3==3'b001)?3'b101:
-    (op5 == 5'b11000 && (func3==3'b100||func3==3'b110))?3'b110:
-    (op5 == 5'b11000 && (func3==3'b101||func3==3'b111))?3'b111:3'b000;
-    
-    assign MemtoReg = (op5 == 5'b01101 || op5 == 5'b00101 || op5 == 5'b00100 || op5 == 5'b01100 || op5 == 5'b11011 ||  op5 == 5'b11001)?0:
-    (op5 == 5'b00000)?1:0;//wrong ?
+
     
     assign MemWr = (op5 == 5'b01000)?1:0;
     //宽度为3bit，控制数据存储器读写格式，为010时为4字节读写，

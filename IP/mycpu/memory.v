@@ -1,11 +1,10 @@
-//memory模块，仅供参考，可以随意修改
 module memory(input wire clk,
               input wire rst,
               input wire[31:0] instr,
-              input wire[31:0] execute_out,
-              input wire MemtoReg,
-              input wire[31:0] rs2,
-              output wire[31:0] memory_out);
+              input wire[31:0] pc,
+              input wire[31:0] EXECUTE_IN,
+              input wire[31:0] REG_VALUE_OUT2,
+              output wire[31:0] MEMORY_OUT);
     //MemtoReg ：宽度为1bit，选择寄存器rd写回数据来源，为0时选择ALU输出，
     //为1时选择数据存储器输出。
     import "DPI-C" function void dpi_mem_write(input int addr, input int data, int len);
@@ -40,11 +39,17 @@ module memory(input wire clk,
     (load_word)              ? load_word_data        :
     (load_byte_unsigned)     ? load_byte_data_u      :
     (load_half_word_unsigned)? load_half_word_data_u : 32'b0;
+
+    wire[4:0] op5=opcode[6:2];
+    wire MemtoReg = //
+    (op5 == 5'b01101 || op5 == 5'b00101 || op5 == 5'b00100 || op5 == 5'b01100 || op5 == 5'b11011 ||  op5 == 5'b11001)?0://ALU to REG
+    (op5 == 5'b00000)?1://MEM to REG,Load
+    0;//wrong ?
     
 
-    assign memory_out=(MemtoReg==1)?read_data_out:execute_out;//
+    assign MEMORY_OUT=(MemtoReg==1)?read_data_out:EXECUTE_IN;//
 
-    wire[31:0]addr=execute_out;
+    wire[31:0]addr=EXECUTE_IN;
     always @(*) begin
         if (read_en) begin
             mem_data_o = dpi_mem_read(addr, 4);
@@ -55,7 +60,7 @@ module memory(input wire clk,
         end
     end
     
-    wire [31:0] data=rs2;
+    wire [31:0] data=REG_VALUE_OUT2;
     always @(posedge clk) begin
         if (store_byte) begin
             dpi_mem_write(addr, data, 1);
