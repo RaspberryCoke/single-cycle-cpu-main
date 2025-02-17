@@ -23,15 +23,15 @@ wire MemtoReg;
 wire MemWr;
 wire[2:0] MemOP;
 wire[31:0]Imm;//from fetch to execute
-//decode
-wire[4:0] wb_to_reg_id;//Rw
-//wire[4:0] Rw;//from writeback to decode
-wire wb_to_reg_en;//RegWr
-// wire RegWr;//from writeback to decode
-wire[31:0] wb_to_reg_data;//busW
-//wire[31:0] busW;//from writeback to decode
-wire[31:0]rs1;//decode output
-wire[31:0]rs2;//decode output
+
+//*decode 译码阶段
+wire WB_REG_WRITE_EN_OUT;//writeback to decode,是否需要写回reg
+wire[4:0] WB_REG_ID_OUT;//writeback to decode,准备写回的reg的id
+wire[31:0] WB_DATA_OUT;//writeback to decode,准备写回的reg的data
+
+wire[31:0]DEC_REG_VALUE_OUT1;//decode to execute
+wire[31:0]DEC_REG_VALUE_OUT2;//decode to execute
+
 //execute
 wire Less;
 wire Zero;
@@ -71,25 +71,37 @@ fetch fetch_module(
 	.Imm(Imm)
 );
 
+// module decode(input wire clk,
+//               input wire rst,
+//               input wire[31:0] instr,
+//               input wire[31:0] pc,
+
+//               input wire WBtoDEC_REG_WRITE_EN_IN,//from writeback
+//               input wire[4:0] WBtoDEC_REG_ID_IN,//from writeback
+//               input wire[31:0] WBtoDEC_DATA_IN,//from writeback
+
+//               output wire[31:0]REG_VALUE_OUT1,
+//               output wire[31:0]REG_VALUE_OUT2
+//               );
+
 decode decode_module(
 	.clk(clk),
 	.rst(rst),
-	.instr_debug(instr),
-	.pc_debug(pc),
-	.Ra(Ra),
-	.Rb(Rb),
-	.Rw(wb_to_reg_id),//from writeback
-	.RegWr(wb_to_reg_en),//from writeback
-	.busW(wb_to_reg_data),//from writeback
-	.rs1(rs1),
-	.rs2(rs2),
+	.instr(instr),
+	.pc(pc),
+
+	.WBtoDEC_REG_WRITE_EN_IN(WB_REG_WRITE_EN_OUT),
+	.WBtoDEC_REG_ID_IN(WB_REG_ID_OUT),
+	.WBtoDEC_DATA_IN(WB_DATA_OUT),
+
+	.REG_VALUE_OUT1(DEC_REG_VALUE_OUT1),//from writeback
+	.REG_VALUE_OUT2(DEC_REG_VALUE_OUT2)//from writeback
 );
 
 execute execute_module(
 	.clk(clk),
 	.rst(rst),
-	.instr_debug(instr),
-	.pc_debug(pc),
+	.instr(instr),
 	.pc(pc),
 	.rs1(rs1),
 	.rs2(rs2),
@@ -103,6 +115,9 @@ execute execute_module(
 	.Result(Result),
 	.NextPC(NextPC)
 );
+
+
+
 
 memory memory_module(
 	.clk(clk),

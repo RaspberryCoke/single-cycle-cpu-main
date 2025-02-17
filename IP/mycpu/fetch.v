@@ -4,20 +4,7 @@
 module fetch #(WIDTH = 32)
               (input wire [WIDTH - 1:0] pc,
                output wire [WIDTH - 1:0] instr,
-               output wire[4:0] Ra,
-               output wire[4:0] Rb,
-               //output wire RegWr,
-               output wire ALUAsrc,
-               output wire[1:0] ALUBsrc,
-               output wire[3:0] ALUctr,
-               output wire[2:0] Branch,
-               output wire MemtoReg,
-               output wire MemWr,
-               output wire[2:0] MemOP,
-               output wire Zero,
-               output wire Less,
-               output wire ImmValid,
-               output wire[31:0]Imm);
+;
     import "DPI-C" function int  dpi_mem_read 	(input int addr  , input int len);
     import "DPI-C" function void dpi_ebreak		(input int pc);
     
@@ -99,7 +86,7 @@ module fetch #(WIDTH = 32)
     (op5 == 5'b00000&&func3 == 3'b100)?3'b100:
     (op5 == 5'b00000&&func3 == 3'b101)?3'b101:3'b111;//wrong ?
     
-    assign ALUAsrc = (op5 == 5'b00101 || op5 == 5'b11011 || (op5 == 5'b11001&&func3 == 3'b000))?1:0;//wrong ?
+    assign ALUAsrc = (op5 == 5'b00101 || op5 == 5'b11011 || (op5 == 5'b11001&&func3 == 3'b000))?1:0;
     
     assign ALUBsrc = 
     (op5 == 5'b11011 || op5 == 5'b11001)?2'b10:

@@ -100,7 +100,7 @@ extern void __eprintf (const char *, const char *, unsigned int, const char *)
 #endif
 #endif
 
-/* FIXME: This #ifdef probably should be removed, ie. enable the test
+/* FI XME: This #ifdef probably should be removed, ie. enable the test
    for mips too.  */
 /* Don't use IBM Extended Double TFmode for TI->SF calculations.
    The conversion from long double to float suffers from double

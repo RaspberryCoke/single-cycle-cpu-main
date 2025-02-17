@@ -336,7 +336,7 @@ extern UDItype __umulsidi3 (USItype, USItype);
     (w1) = (USItype) (__x >> 32);	\
   } while (0)
 
-/* FIXME: defining add_ssaaaa and sub_ddmmss should be advantageous for
+/* F IXME: defining add_ssaaaa and sub_ddmmss should be advantageous for
    DFmode ("double" intrinsics, avoiding two of the three insns handling
    carry), but defining them as open-code C composing and doing the
    operation in DImode (UDImode) shows that the DImode needs work:
@@ -860,9 +860,9 @@ extern UDItype __umulsidi3 (USItype, USItype);
 #endif
 #endif /* __mips__ */
 
-/* FIXME: We should test _IBMR2 here when we add assembly support for the
+/* F IXME: We should test _IBMR2 here when we add assembly support for the
    system vendor compilers.
-   FIXME: What's needed for gcc PowerPC VxWorks?  __vxworks__ is not good
+   FI XME: What's needed for gcc PowerPC VxWorks?  __vxworks__ is not good
    enough, since that hits ARM and m68k too.  */
 #if (defined (_ARCH_PPC)	/* AIX */				\
      || defined (__powerpc__)	/* gcc */				\

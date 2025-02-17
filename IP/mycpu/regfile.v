@@ -2,7 +2,8 @@ module regfile(
 	input            clk,
 	input            rst,
 	//debug 
-	input [31:0] instr_debug,	
+	input wire[31:0] instr_debug,	
+	input wire[31:0] pc_debug,
 	//from decode
 	input   [ 4:0]   rs1_id_i,
 	input   [ 4:0]   rs2_id_i,
