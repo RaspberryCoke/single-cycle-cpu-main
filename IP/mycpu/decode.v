@@ -15,7 +15,7 @@ module decode(input wire clk,
                wire[4:0] reg_id1=instr[19:15];
                wire[4:0] reg_id2=instr[24:20];
 
-               //output wire RegWr,
+
 
 
 

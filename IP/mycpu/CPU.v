@@ -12,37 +12,16 @@ wire[31:0] NextPC;
 assign cur_pc_for_simulator=pc;
 //fetch
 wire[31:0] instr;
-wire[4:0] Ra;
-wire[4:0] Rb;
-
-wire ALUAsrc;
-wire[1:0] ALUBsrc;
-wire[3:0] ALUctr;
-wire[2:0] Branch;
-wire MemtoReg;
-wire MemWr;
-wire[2:0] MemOP;
-wire[31:0]Imm;//from fetch to execute
-
 //*decode 译码阶段
 wire WB_REG_WRITE_EN_OUT;//writeback to decode,是否需要写回reg
 wire[4:0] WB_REG_ID_OUT;//writeback to decode,准备写回的reg的id
 wire[31:0] WB_DATA_OUT;//writeback to decode,准备写回的reg的data
-
-wire[31:0]DECODE_REG_VALUE_OUT1;//decode to execute
-wire[31:0]DECODE_REG_VALUE_OUT2;//decode to execute
-
+wire[31:0]DECODE_REG_VALUE_OUT1;
+wire[31:0]DECODE_REG_VALUE_OUT2;
 //execute
 wire[31:0] EXECUTE_OUT;
-wire[31:0] NextPC;//from execute to select_pc
 //memory
-wire[31:0] MEMORY_OUT;//DataOut
-
-
-
-
-
-
+wire[31:0] MEMORY_OUT;
 
 select_pc select_pc_module(
 	.clk(clk),
@@ -55,7 +34,6 @@ fetch fetch_module(
 	.pc(pc),
 	.instr(instr)
 );
-
 
 decode decode_module(
 	.clk(clk),
@@ -71,8 +49,6 @@ decode decode_module(
 	.REG_VALUE_OUT2(DECODE_REG_VALUE_OUT2)//from writeback
 );
 
-
-
 execute execute_module(
 	.clk(clk),
 	.rst(rst),
@@ -84,8 +60,6 @@ execute execute_module(
 	.NextPC(NextPC)
 );
 
-
-
 memory memory_module(
 	.clk(clk),
 	.rst(rst),
@@ -93,23 +67,19 @@ memory memory_module(
 	.pc(pc),
 
 	.EXECUTE_IN(EXECUTE_OUT),
-	.MemtoReg(MemtoReg),
-	.rs2(rs2),
+	.REG_VALUE_OUT2(DECODE_REG_VALUE_OUT2),
 	.MEMORY_OUT(MEMORY_OUT)
 );
-
-
 
 writeback writeback_module(
 	.clk(clk),
 	.rst(rst),
 	.instr(instr),
 	.pc(pc),
-	.MEMORY_IN(memory_out),
-	.WRITEBACK_TO_DECODE_REG_DATA(WRITEBACK_TO_DECODE_REG_DATA),//from writeback to decode
-	.WRITEBACK_TO_DECODE_REG_ID(WRITEBACK_TO_DECODE_REG_ID),
-	.WRITEBACK_TO_DECODE_REG_EN(WRITEBACK_TO_DECODE_REG_EN)
+
+	.MEMORY_OUT(MEMORY_OUT),
+	.WRITEBACK_TO_DECODE_REG_DATA(WB_DATA_OUT),//from writeback to decode
+	.WRITEBACK_TO_DECODE_REG_ID(WB_REG_ID_OUT),
+	.WRITEBACK_TO_DECODE_REG_EN(WB_REG_WRITE_EN_OUT)
 );
-
-
 endmodule

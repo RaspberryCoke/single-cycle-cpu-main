@@ -55,8 +55,9 @@ end
 	// wire load_instr=load_byte|load_half_word|load_word|load_byte_unsigned|load_half_word_unsigned;
 	// wire store_instr=store_byte|store_half_word|store_word;
 // always@(*)begin
-// 	if(opcode==7'b0110111)
-// 		begin $display("\t[refile.v]:store instr:: read data from regfile[%h]=%h.\n",rd_id_i,rd_write_data_i); end
+// 	$display("[regfile.v]:instr=%8h,pc=%8h.",instr_debug,pc_debug);
+// 	// if(op==7'b0110111)
+// 	// 	begin $display("\t[refile.v]:store instr:: read data from regfile[%h]=%h.\n",rd_id_i,rd_write_data_i); end
 // end
 	//! debug
 endmodule

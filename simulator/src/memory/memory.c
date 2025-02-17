@@ -19,7 +19,7 @@ void init_mem() {
 uint8_t* guest_to_host(paddr_t paddr) { return pmem + paddr - CONFIG_MBASE; }
 
 static inline word_t host_read(void *addr, int len) {
-  printf("\t[memory.c]: host_read:addr=%p,len=%d,data=%x\n",addr,len,*(uint32_t  *)addr);
+  //printf("\t[memory.c]: host_read:addr=%p,len=%d,data=%x\n",addr,len,*(uint32_t  *)addr);
   switch (len) {
     case 1: return *(uint8_t  *)addr;
     case 2: return *(uint16_t *)addr;
@@ -29,7 +29,7 @@ static inline word_t host_read(void *addr, int len) {
   }
 }
 static inline void host_write(void *addr, int len, word_t data) {
-  printf("\t[memory.c]: host_write:addr=%p,len=%d,data=%x\n",addr,len,data);
+  //printf("\t[memory.c]: host_write:addr=%p,len=%d,data=%x\n",addr,len,data);
   switch (len) {
     case 1: *(uint8_t  *)addr = data; return;
     case 2: *(uint16_t *)addr = data; return;

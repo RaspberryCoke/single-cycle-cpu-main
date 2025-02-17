@@ -1,3 +1,4 @@
+//Imm 格式
 `define IMMI 3'b000
 `define IMMU 3'b001
 `define IMMS 3'b010

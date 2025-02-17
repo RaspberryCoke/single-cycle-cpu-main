@@ -28,7 +28,7 @@ module execute(input wire clk,
     wire[4:0]  rd    = instr[11:7];
     wire[2:0]  func3 = instr[14:12];
     wire[6:0]  func7 = instr[31:25];
-    wire[4:0] op5    = op[6:2];
+
     wire[31:0] Imm;
     wire ImmValid;
     wire ALUAsrc;
@@ -36,6 +36,7 @@ module execute(input wire clk,
     wire[3:0] ALU_Operation;
     wire Zero;
     wire Less;
+    wire LargerOrEqual;
     wire[2:0] Branch;
     wire[31:0] ALU_A;
     wire[31:0] ALU_B;
@@ -97,16 +98,8 @@ module execute(input wire clk,
     (beq || bne || blt || bge || bltu || bgeu)?`IMMB:
     (sb||sh||sw)?`IMMS:
     (add || sub || sll || slt || sltu || xor_ || srl || sra || or_ || and_)?`IMM_NONE:
-    `IMM_ERR; // wrong case
-    
-    //!错误处理
-    always@(*)begin
-        if (Create_Imm_Operation == `IMM_ERR)begin
-            $display("[execute.v]:Create_Imm_Operation == `IMM_ERR ERROR!");
-            $display("[execute.v]:stop!");
-            $stop;
-        end
-    end
+    `IMM_ERR; // wrong case or other instruction
+    //TODO 将来添加指令考虑此处
     
     assign Imm = 
     (Create_Imm_Operation == `IMMI)?ImmI:
@@ -126,6 +119,7 @@ module execute(input wire clk,
     (lui || auipc|| addi|| slti|| sltiu|| xori||ori||andi||slli||srli||srai||lb||lh||lw||lbu||lhu||sb||sh||sw)?Imm:
     (jal || jalr)?4:
     0;//error or other instructions.
+    //TODO 将来添加指令考虑此处
     //endregion
     
     
@@ -143,6 +137,7 @@ module execute(input wire clk,
     (sub)?`SUB:
     (auipc||addi||add||jal||jalr||lb||lh||lw||lbu||lhu||sb||sh||sw)?`ADD:
     `UNDEFINEED_EXECUTE_OPERATION;//undefined operation
+    //TODO 将来添加指令考虑此处
     //endregion
     
     
@@ -163,16 +158,33 @@ module execute(input wire clk,
     //endregion
     
     //region 是否跳转、计算NextPC  
-    // TODO :Less
+    assign Branch=
+    jal?`ALWAYS_JUMP_PC_ADD_IMM:
+    jalr?`ALWAYS_JUMP_REG_ADD_IMM:
+    beq?`TEST_EQUAL_JUMP:
+    bne?`TEST_NOT_EQUAL_JUMP:
+    blt?`TEST_LESS_THAN_JUMP:
+    bge?`TEST_LARGER_OR_EQUAL_JUMP:
+    bltu?`TEST_LESS_THAN_JUMP:
+    bgeu?`TEST_LARGER_OR_EQUAL_JUMP:
+    `NO_JUMP;
+
     assign Zero = ((beq || bne) && (ALU_A == ALU_B))?1:0;
     assign Less = 
-    (((blt||bge) && ($signed(ALU_A)<$signed(ALU_B)))||
-    ((bltu||bgeu) && (ALU_A<ALU_B)))?1:0;
+    ((blt && ($signed(ALU_A)<$signed(ALU_B)))||
+    (bltu&& (ALU_A<ALU_B)))?1:0;
+    assign LargerOrEqual = 
+    ((bge && ($signed(ALU_A)>=$signed(ALU_B)))||
+    (bgeu && (ALU_A>=ALU_B)))?1:0;
     
     wire PCAsrc = 
-    (Branch == `ALWAYS_JUMP_PC_ADD_IMM||Branch == `ALWAYS_JUMP_REG_ADD_IMM||
-    (Branch == `TEST_EQUAL_JUMP && Zero == 1)||(Branch == `TEST_NOT_EQUAL_JUMP && Zero == 0)||
-    (Branch == `TEST_LESS_THAN_JUMP && Less == 1)||(Branch == `TEST_LARGER_OR_EQUAL_JUMP&&Less == 0))?1:0;
+    ((Branch == `ALWAYS_JUMP_PC_ADD_IMM)||
+    (Branch == `ALWAYS_JUMP_REG_ADD_IMM)||
+    (Branch == `TEST_EQUAL_JUMP && Zero == 1)||
+    (Branch == `TEST_NOT_EQUAL_JUMP && Zero == 0)||
+    (Branch == `TEST_LESS_THAN_JUMP && Less == 1)||
+    (Branch == `TEST_LARGER_OR_EQUAL_JUMP&&LargerOrEqual == 1))?1:0;
+
     wire PCBsrc   = (Branch == `ALWAYS_JUMP_REG_ADD_IMM)?1:0;
     wire[31:0]PCA = ((PCAsrc == 0)?32'h4:Imm);
     wire[31:0]PCB = ((PCBsrc == 0)?pc:REG_VALUE_IN1);
