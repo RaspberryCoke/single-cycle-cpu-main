@@ -18,6 +18,8 @@ wire[4:0] WB_REG_ID_OUT;//writeback to decode,准备写回的reg的id
 wire[31:0] WB_DATA_OUT;//writeback to decode,准备写回的reg的data
 wire[31:0]DECODE_REG_VALUE_OUT1;
 wire[31:0]DECODE_REG_VALUE_OUT2;
+wire[31:0]DECODE_IMM_OUT;
+wire MemtoReg;
 //execute
 wire[31:0] EXECUTE_OUT;
 //memory
@@ -46,7 +48,8 @@ decode decode_module(
 	.WRITEBACK_TO_DECODE_DATA_IN(WB_DATA_OUT),
 
 	.REG_VALUE_OUT1(DECODE_REG_VALUE_OUT1),//from writeback
-	.REG_VALUE_OUT2(DECODE_REG_VALUE_OUT2)//from writeback
+	.REG_VALUE_OUT2(DECODE_REG_VALUE_OUT2),//from writeback
+	.IMM_OUT(DECODE_IMM_OUT)
 );
 
 execute execute_module(
@@ -54,9 +57,12 @@ execute execute_module(
 	.rst(rst),
 	.instr(instr),
 	.pc(pc),
+	
 	.REG_VALUE_IN1(DECODE_REG_VALUE_OUT1),
 	.REG_VALUE_IN2(DECODE_REG_VALUE_OUT2),
+	.DECODE_IMM_IN(DECODE_IMM_OUT),
 	.EXECUTE_OUT(EXECUTE_OUT),
+	.MemtoReg(MemtoReg),
 	.NextPC(NextPC)
 );
 
@@ -67,6 +73,7 @@ memory memory_module(
 	.pc(pc),
 
 	.EXECUTE_IN(EXECUTE_OUT),
+	.MemtoReg(MemtoReg),
 	.REG_VALUE_OUT2(DECODE_REG_VALUE_OUT2),
 	.MEMORY_OUT(MEMORY_OUT)
 );

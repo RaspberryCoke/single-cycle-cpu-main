@@ -5,7 +5,9 @@ module execute(input wire clk,
                input wire[31:0] pc,
                input wire[31:0] REG_VALUE_IN1,
                input wire[31:0] REG_VALUE_IN2,
+               input wire[31:0] DECODE_IMM_IN,
                output wire[31:0] EXECUTE_OUT,
+               output wire MemtoReg,
                output wire[31:0] NextPC);
     
     
@@ -29,8 +31,6 @@ module execute(input wire clk,
     wire[2:0]  func3 = instr[14:12];
     wire[6:0]  func7 = instr[31:25];
 
-    wire[31:0] Imm;
-    wire ImmValid;
     wire ALUAsrc;
     wire[1:0] ALUBsrc;
     wire[3:0] ALU_Operation;
@@ -83,40 +83,12 @@ module execute(input wire clk,
     wire ecall  = (op == 7'b1110011 && func3 == 3'b000 && func7 == 7'b0000000);
     wire ebreak = (op == 7'b1110011 && func3 == 3'b000 && func7 == 7'b0000001);
     //endregion
-    
-    //region 进行立即数的处理
-    wire[31:0] ImmI = {{20{instr[31]}}, instr[31:20]};
-    wire[31:0] ImmU = {instr[31:12], 12'b0};
-    wire[31:0] ImmS = {{20{instr[31]}}, instr[31:25], instr[11:7]};
-    wire[31:0] ImmB = {{20{instr[31]}}, instr[7], instr[30:25], instr[11:8], 1'b0};
-    wire[31:0] ImmJ = {{12{instr[31]}}, instr[19:12], instr[20], instr[30:21], 1'b0};
-    
-    wire[2:0] Create_Imm_Operation = //num:37
-    ((addi || slti || sltiu || xori || ori || andi || slli ||srli || srai||jalr||lb||lh||lw||lbu||lhu))?`IMMI:// 15条
-    (lui || auipc)?`IMMU:
-    (jal)?`IMMJ:
-    (beq || bne || blt || bge || bltu || bgeu)?`IMMB:
-    (sb||sh||sw)?`IMMS:
-    (add || sub || sll || slt || sltu || xor_ || srl || sra || or_ || and_)?`IMM_NONE:
-    `IMM_ERR; // wrong case or other instruction
-    //TODO 将来添加指令考虑此处
-    
-    assign Imm = 
-    (Create_Imm_Operation == `IMMI)?ImmI:
-    (Create_Imm_Operation == `IMMU)?ImmU:
-    (Create_Imm_Operation == `IMMS)?ImmS:
-    (Create_Imm_Operation == `IMMB)?ImmB:
-    (Create_Imm_Operation == `IMMJ)?ImmJ:32'b0;
-    
-    assign ImmValid = (Create_Imm_Operation == `IMM_ERR)?0:1;
-    //endregion
-    
-    
+
     //region ALU的两个操作数A,B赋值
     assign ALU_A = ((auipc || jal || jalr)?pc:REG_VALUE_IN1);
     assign ALU_B = //37
     (add || sub|| sll||slt||sltu||xor_||srl||sra||or_||and_ || beq || bne || blt || bge || bltu || bgeu)?REG_VALUE_IN2:
-    (lui || auipc|| addi|| slti|| sltiu|| xori||ori||andi||slli||srli||srai||lb||lh||lw||lbu||lhu||sb||sh||sw)?Imm:
+    (lui || auipc|| addi|| slti|| sltiu|| xori||ori||andi||slli||srli||srai||lb||lh||lw||lbu||lhu||sb||sh||sw)?DECODE_IMM_IN:
     (jal || jalr)?4:
     0;//error or other instructions.
     //TODO 将来添加指令考虑此处
@@ -157,7 +129,8 @@ module execute(input wire clk,
     32'b0;
     //endregion
     
-    //region 是否跳转、计算NextPC  
+    //region 是否跳转、计算NextPC
+    //注意：这里为了尽早计算出结果，所以在这里计算是否跳转以及跳转地址
     assign Branch=
     jal?`ALWAYS_JUMP_PC_ADD_IMM:
     jalr?`ALWAYS_JUMP_REG_ADD_IMM:
@@ -186,9 +159,26 @@ module execute(input wire clk,
     (Branch == `TEST_LARGER_OR_EQUAL_JUMP&&LargerOrEqual == 1))?1:0;
 
     wire PCBsrc   = (Branch == `ALWAYS_JUMP_REG_ADD_IMM)?1:0;
-    wire[31:0]PCA = ((PCAsrc == 0)?32'h4:Imm);
+    wire[31:0]PCA = ((PCAsrc == 0)?32'h4:DECODE_IMM_IN);
     wire[31:0]PCB = ((PCBsrc == 0)?pc:REG_VALUE_IN1);
     assign NextPC = PCA+PCB;
+    //endregion
+
+    //region 判断是返回execute结果还是读内存结果
+    assign MemtoReg = //MEMORY write data to REG? OR ALU write to REG?
+    //* ALU to REG
+    (op == 7'b0110111 ||//lui
+    op == 7'b0010111 ||//auipc
+    op == 7'b0010011 ||//[addi,slti,sltiu,xori,ori,andi,slli,srli,srai]
+    op == 7'b0110011 ||//[add,sub,sll,slt,sltu,xor,srl,sra,or,and]
+    op == 7'b1101111 ||//jal
+    op == 7'b1100111)?0://jalr
+    //* MEM to REG
+    (op == 7'b0000011)?1://[lb,lh,lw,lbu,lhu] MEM to REG,Load
+    (op == 7'b0100011)?1://*注意：[sb,sh,sw]在这里取指0或者1都可以，因为不写回REG。
+    //TODO 将来扩展指令应注意。
+    //* other instructions
+    0;
     //endregion
     
 endmodule
