@@ -12,6 +12,7 @@
 
 !README.md
 !Kconfig
+!*.drawio
 build
 include/config
 include/generated

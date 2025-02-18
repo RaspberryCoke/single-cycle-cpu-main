@@ -7,6 +7,7 @@ module regfile(
 	//from decode
 	input   [ 4:0]   rs1_id_i,
 	input   [ 4:0]   rs2_id_i,
+
 	
 	output  [31:0]   rs1_rdata_o,
 	output  [31:0]   rs2_rdata_o,

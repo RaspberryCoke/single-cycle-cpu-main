@@ -15,4 +15,5 @@ build/
 !LICENSE
 !riscv-tests-am
 !.gitignore
+!*.drawio
 
