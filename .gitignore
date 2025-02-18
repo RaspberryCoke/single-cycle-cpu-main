@@ -17,3 +17,5 @@ include/generated
 .cache
 *.json
 !.editorconfig
+# 不忽略 .drawio 文件
+!*.drawio
