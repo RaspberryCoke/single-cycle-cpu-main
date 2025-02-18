@@ -49,10 +49,10 @@ assign decode_rs2_id_o = rs2;
 assign decode_rd_id_o  = rd;
 assign decode_csr_id_o = inst_i[31:20];
 
-//reg-imm
+//reg-imm   立即数指令的opcode
 wire inst_alu_imm   = (opcode == 7'b00_100_11);
 
-//reg-reg
+//reg-reg   寄存器指令的opcode
 wire inst_alu       = (opcode == 7'b01_100_11);
 
 wire inst_jal       = (opcode == 7'b11_011_11);
@@ -68,7 +68,7 @@ wire inst_auipc     = (opcode == 7'b00_101_11);
 wire inst_system    = (opcode == 7'b111_00_11);
 
 
-//ALU op reg-imm
+//ALU op reg-imm 立即数指令
 wire inst_addi  = inst_alu_imm   & (funct3 == 3'b000);
 wire inst_slli  = inst_alu_imm   & (funct3 == 3'b001) & (funct7 == 7'b00_000_00);
 wire inst_slti  = inst_alu_imm   & (funct3 == 3'b010);
@@ -78,7 +78,7 @@ wire inst_srli  = inst_alu_imm   & (funct3 == 3'b101) & (funct7 == 7'b00_000_00)
 wire inst_srai  = inst_alu_imm   & (funct3 == 3'b101) & (funct7 == 7'b01_000_00);
 wire inst_ori   = inst_alu_imm   & (funct3 == 3'b110);
 wire inst_andi  = inst_alu_imm   & (funct3 == 3'b111);
-
+//寄存器指令
 wire inst_add   = inst_alu   & (funct3 == 3'b000) & (funct7 == 7'b00_000_00);
 wire inst_sub   = inst_alu   & (funct3 == 3'b000) & (funct7 == 7'b01_000_00);
 wire inst_sll   = inst_alu   & (funct3 == 3'b001) & (funct7 == 7'b00_000_00);
@@ -89,7 +89,7 @@ wire inst_srl   = inst_alu   & (funct3 == 3'b101) & (funct7 == 7'b00_000_00);
 wire inst_sra   = inst_alu   & (funct3 == 3'b101) & (funct7 == 7'b01_000_00);
 wire inst_or    = inst_alu   & (funct3 == 3'b110) & (funct7 == 7'b00_000_00);
 wire inst_and   = inst_alu   & (funct3 == 3'b111) & (funct7 == 7'b00_000_00);
-
+//分支指令
 wire inst_beq   = inst_branch & (funct3 == 3'b000);
 wire inst_bne   = inst_branch & (funct3 == 3'b001);
 wire inst_blt   = inst_branch & (funct3 == 3'b100);
@@ -97,18 +97,18 @@ wire inst_bge   = inst_branch & (funct3 == 3'b101);
 wire inst_bltu  = inst_branch & (funct3 == 3'b110);
 wire inst_bgeu  = inst_branch & (funct3 == 3'b111);
 
-//load instruction
+//加载指令
 wire inst_lb  = inst_load & (funct3 == 3'b000);
 wire inst_lh  = inst_load & (funct3 == 3'b001);
 wire inst_lw  = inst_load & (funct3 == 3'b010);
 wire inst_lbu = inst_load & (funct3 == 3'b100);
 wire inst_lhu = inst_load & (funct3 == 3'b101);
 
-//store
+//存储指令
 wire inst_sb  = inst_store & (funct3 == 3'b000);
 wire inst_sh  = inst_store & (funct3 == 3'b001);
 wire inst_sw  = inst_store & (funct3 == 3'b010);
-
+//system指令
 wire inst_ecall  = inst_system & (funct3 == 3'b000) & (inst_i[31:20] == 12'b0000_0000_0000);
 wire inst_ebreak = inst_system & (funct3 == 3'b000) & (inst_i[31:20] == 12'b0000_0000_0001);
 wire inst_mret   = inst_system & (funct3 == 3'b000) & (inst_i[31:20] == 12'b0011_0000_0010);
