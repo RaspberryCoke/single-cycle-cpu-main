@@ -136,7 +136,7 @@ assign decode_opcode_info_o = {
 assign decode_alu_info_o = {
 			     (inst_add  | inst_addi ),  // 9
 			     (inst_sub              ),  // 8
-                             (inst_sll  | inst_slli ),  // 7
+                 (inst_sll  | inst_slli ),  // 7
 			     (inst_slt  | inst_slti ),  // 6
 			     (inst_sltu | inst_sltiu),  // 5
 			     (inst_xor  | inst_xori ),  // 4
